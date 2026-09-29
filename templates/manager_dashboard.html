@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}Tableau de bord{% endblock %}
+{% block content %}
+
+<h2>📖 {{ config.APP_NAME }}</h2>
+
+{% if not cycle %}
+  <div class="card">
+    <p>Aucun cycle actif pour le moment.</p>
+    {% if not settings.cycle_auto %}
+      <p style="color: var(--color-muted); font-size: 0.85rem;">
+        Le cycle automatique est désactivé (voir Paramètres). Crée la semaine manuellement :
+      </p>
+      <a class="btn" href="{{ url_for('new_cycle') }}">Créer une nouvelle semaine</a>
+    {% endif %}
+  </div>
+{% else %}
+
+  {% if erreurs %}
+    <div class="card">
+      <h3>Vérification de la répartition</h3>
+      {% for e in erreurs %}
+        <p class="flash error">{{ e }}</p>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% if sans_hizb %}
+    <div class="card">
+      <h3>🔴 {{ sans_hizb|length }} membre(s) n'ont pas encore de جزء attribué</h3>
+      <table>
+        <thead><tr><th>Membre</th><th>WhatsApp</th><th></th></tr></thead>
+        <tbody>
+          {% for m in sans_hizb %}
+          <tr>
+            <td>{{ m.full_name }}</td>
+            <td>{{ m.whatsapp }}</td>
+            <td><a class="btn small" href="{{ url_for('assign_hizb', member_id=m.id) }}">+ Attribuer un جزء</a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+
+  <div class="card">
+    <h3>Khatm en cours</h3>
+    <p style="color: var(--color-muted);">
+      Semaine du {{ cycle.date_debut|date_fr }} au {{ cycle.date_fin|date_fr(true) }}
+      {% if settings.cycle_auto %}<span style="font-size:0.8rem;">(cycle automatique Vendredi → Jeudi)</span>{% endif %}
+    </p>
+
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="value">{{ progress.membres_confirmes }}/{{ progress.total_membres }}</div>
+        <div class="label">Membres confirmés</div>
+      </div>
+      <div class="stat-box">
+        <div class="value">{{ progress.hizb_confirmes }}/{{ progress.total_hizb }}</div>
+        <div class="label">أجزاء confirmés</div>
+      </div>
+      <div class="stat-box">
+        <div class="value">{{ progress.pourcentage_membres }}%</div>
+        <div class="label">Terminé</div>
+      </div>
+    </div>
+
+    <div class="progress-bar">
+      <div class="progress-bar-fill" style="width: {{ progress.pourcentage_membres }}%;"></div>
+    </div>
+
+    <h3 style="margin-top:22px;">Situation</h3>
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="value">{{ progress.membres_confirmes }}</div>
+        <div class="label">🟢 Terminés</div>
+      </div>
+      <div class="stat-box">
+        <div class="value">{{ progress.nb_pas_encore_termine }}</div>
+        <div class="label">🟠 Pas encore terminés</div>
+      </div>
+      <div class="stat-box">
+        <div class="value">{{ progress.nb_en_retard }}</div>
+        <div class="label">🔴 En retard</div>
+      </div>
+      <div class="stat-box">
+        <div class="value">{{ progress.nb_en_attente }}</div>
+        <div class="label">⏳ Aucune confirmation</div>
+      </div>
+    </div>
+
+    {% if not settings.cycle_auto %}
+      <a class="btn secondary" href="{{ url_for('new_cycle') }}">Créer une nouvelle semaine</a>
+    {% endif %}
+  </div>
+
+  {% set nb_concernes = progress.nb_en_retard + progress.nb_pas_encore_termine + progress.nb_en_attente %}
+  <div class="card">
+    <h3>⚠️ Attention</h3>
+    {% if nb_concernes > 0 %}
+      <p>{{ nb_concernes }} personne(s) nécessitent votre attention.</p>
+      <a class="btn" href="{{ url_for('manager_relances') }}">Voir les personnes concernées</a>
+      <a class="btn secondary" href="{{ url_for('manager_relances') }}">Relancer les personnes concernées</a>
+    {% else %}
+      <p>Tout est à jour, rien à signaler pour le moment. 🎉</p>
+    {% endif %}
+  </div>
+{% endif %}
+
+{% endblock %}

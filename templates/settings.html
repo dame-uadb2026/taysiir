@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Paramètres{% endblock %}
+{% block content %}
+
+<h2>Paramètres</h2>
+
+<form method="POST" action="{{ url_for('manager_settings') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+  <div class="card">
+    <h3>Cycle hebdomadaire</h3>
+    <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+      <input type="checkbox" name="cycle_auto" {% if settings.cycle_auto %}checked{% endif %}>
+      <span>Cycle automatique récurrent (Vendredi → Jeudi)</span>
+    </label>
+    <p style="color: var(--color-muted); font-size: 0.85rem; margin-top:8px;">
+      Quand cette option est activée, l'application clôture automatiquement la semaine
+      terminée et en crée une nouvelle (Vendredi → Jeudi) sans que tu aies besoin de le
+      faire manuellement. Désactive-la si tu préfères créer chaque semaine toi-même.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Modèle de message de rappel</h3>
+    <p style="color: var(--color-muted); font-size: 0.85rem;">
+      Variables disponibles : <code>{prenom}</code> <code>{hizb}</code> (le جزء attribué)
+      <code>{semaine}</code>
+      <code>{date_debut}</code> <code>{date_fin}</code>
+    </p>
+    <div class="form-group">
+      <textarea name="reminder_template" rows="8" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--color-border); font-family:inherit;">{{ settings.reminder_template }}</textarea>
+    </div>
+  </div>
+
+  <button type="submit" class="btn">Enregistrer les paramètres</button>
+</form>
+
+{% endblock %}
