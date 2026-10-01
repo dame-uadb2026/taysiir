@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Ma lecture{% endblock %}
+{% block content %}
+
+<div class="hero">
+  <h2>Assalamu alaykum {{ current_user.prenom }}</h2>
+</div>
+
+{% if not cycle %}
+  <div class="card">
+    <p>Aucune semaine de lecture n'est active pour le moment. Revenez bientôt, in cha Allah.</p>
+  </div>
+{% elif not assignment %}
+  <div class="card">
+    <p>Vous n'avez pas encore d'attribution pour la semaine en cours. Contactez le gérant.</p>
+  </div>
+{% else %}
+  <div class="card">
+    <h3>Votre lecture de cette semaine</h3>
+    <p>Semaine : {{ cycle.date_debut|date_fr }} → {{ cycle.date_fin|date_fr }}</p>
+    <p style="font-size:1.6rem; font-weight:700; color: var(--color-primary-dark);">
+      {{ assignment.hizb_label }}
+    </p>
+
+    {% if confirmation %}
+      <p class="badge termine">🟢 Terminé</p>
+      <p>Alhamdoulillah 🤲 Votre lecture est enregistrée.</p>
+      <p style="color: var(--color-muted); font-size: 0.85rem;">
+        Confirmé le : {{ confirmation.date_confirmation|datetime_fr }}
+      </p>
+    {% else %}
+      {% if signal %}
+        <p class="badge attente">🟠 Pas encore terminé (signalé le {{ signal.date_signal|datetime_fr }})</p>
+      {% endif %}
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <form method="POST" action="{{ url_for('member_confirm') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn">Lecture terminée</button>
+        </form>
+        <form method="POST" action="{{ url_for('member_not_done') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn secondary">Pas encore terminé</button>
+        </form>
+      </div>
+    {% endif %}
+  </div>
+{% endif %}
+
+{% endblock %}
