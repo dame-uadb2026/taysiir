@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Mon compte{% endblock %}
+{% block content %}
+
+<h2>Mon compte</h2>
+
+<div class="card">
+  <p><strong>{{ current_user.full_name }}</strong> — {{ current_user.whatsapp }}</p>
+  <p style="color: var(--color-muted); font-size: 0.85rem;">
+    {{ 'Gérant' if current_user.is_manager else 'Membre' }}
+  </p>
+</div>
+
+<div class="card">
+  <h3>Changer mon mot de passe</h3>
+  <form method="POST" action="{{ url_for('account') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="form-group">
+      <label for="ancien_mdp">Mot de passe actuel</label>
+      <input type="password" id="ancien_mdp" name="ancien_mdp" required>
+    </div>
+    <div class="form-group">
+      <label for="nouveau_mdp">Nouveau mot de passe</label>
+      <input type="password" id="nouveau_mdp" name="nouveau_mdp" required>
+    </div>
+    <div class="form-group">
+      <label for="confirmation_mdp">Confirmer le nouveau mot de passe</label>
+      <input type="password" id="confirmation_mdp" name="confirmation_mdp" required>
+    </div>
+    <button type="submit" class="btn">Mettre à jour</button>
+  </form>
+</div>
+
+{% endblock %}

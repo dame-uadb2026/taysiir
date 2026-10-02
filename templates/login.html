@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Connexion{% endblock %}
+{% block content %}
+<div class="hero">
+  {% if amicale and amicale.logo_data %}
+    <img src="{{ url_for('organization_logo', organization_id=amicale.id) }}" alt="Logo" class="logo-aertm">
+  {% endif %}
+  <div class="arabic-title">{{ config.APP_NAME }}</div>
+  {% if amicale %}
+    <div class="org-name">{{ amicale.nom }}</div>
+  {% endif %}
+  <div class="tagline">Assistant numérique pour la gestion de la lecture collective du Coran</div>
+  <div class="tagline">Moins de gestion. Plus de lecture.</div>
+</div>
+
+<div class="citation">
+  <div class="arabic">كُلُّ مُرِيدٍ بِي يَلُوذُ فَلْيُدِمْ۞<br>تِلَاوَةً لِخَيْرِ ذِكْرٍ قَدْ رُسِم</div>
+  <div class="translation">« Tout disciple qui cherche refuge auprès de moi, qu'il perpétue la récitation du meilleur Rappel (le Coran) qui a été transcrit. »</div>
+  <div class="source">— Cheikh Ahmadou Bamba</div>
+</div>
+
+<div class="login-wrapper card">
+  <h2>Connexion</h2>
+  <form method="POST" action="{{ url_for('login') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="form-group">
+      <label for="whatsapp">Numéro WhatsApp</label>
+      <input type="text" id="whatsapp" name="whatsapp" placeholder="+221 77 000 00 00" required>
+    </div>
+    <div class="form-group">
+      <label for="password">Mot de passe</label>
+      <input type="password" id="password" name="password" required>
+    </div>
+    <button type="submit" class="btn">Se connecter</button>
+  </form>
+  {% if config.ALLOW_ORG_SIGNUP %}
+  <p style="text-align:center; margin-top:16px; font-size:0.85rem; color: var(--color-muted);">
+    Vous représentez une autre amicale ?
+    <a href="{{ url_for('create_organization') }}">Créer votre espace</a>
+  </p>
+  {% endif %}
+</div>
+{% endblock %}

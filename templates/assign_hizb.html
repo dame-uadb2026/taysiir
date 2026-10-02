@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Attribuer un جزء{% endblock %}
+{% block content %}
+
+<p><a href="{{ url_for('member_detail', member_id=membre.id) }}">← Retour à la fiche</a></p>
+
+<h2>{{ 'Modifier le جزء' if assignment else 'Attribuer un جزء' }} — {{ membre.full_name }}</h2>
+
+<div class="card">
+  <p style="color: var(--color-muted); font-size: 0.9rem;">
+    Semaine du {{ cycle.date_debut|date_fr }} au {{ cycle.date_fin|date_fr(true) }}.
+    Fais défiler la liste ci-dessous pour voir les 30 أجزاء. Ceux déjà attribués
+    à un autre membre sont grisés et indiqués comme indisponibles.
+  </p>
+
+  <form method="POST" action="{{ url_for('assign_hizb', member_id=membre.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div style="max-height: 340px; overflow-y: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--color-border); border-radius: 10px; margin-bottom: 16px;" dir="rtl">
+      {% for opt in options %}
+        <label style="display:flex; align-items:center; gap:10px; padding:12px 14px; border-bottom: 1px solid var(--color-border); cursor: {{ 'not-allowed' if not opt.disponible else 'pointer' }}; {% if not opt.disponible %}opacity:0.5; background:var(--color-bg);{% endif %}">
+          <input type="radio" name="juz_numero" value="{{ opt.numero }}"
+                 {% if assignment and assignment.hizb_debut == opt.numero %}checked{% endif %}
+                 {% if not opt.disponible %}disabled{% endif %}
+                 required style="flex-shrink:0; width:18px; height:18px;">
+          <span style="flex:1;">
+            {{ opt.label }}
+            {% if not opt.disponible %}<br><span style="font-size:0.78rem; color: var(--color-red);">Déjà attribué à {{ opt.attribue_a }}</span>{% endif %}
+          </span>
+        </label>
+      {% endfor %}
+    </div>
+
+    <button type="submit" class="btn">{{ 'Enregistrer le nouveau جزء' if assignment else 'Attribuer ce جزء' }}</button>
+  </form>
+</div>
+
+{% endblock %}

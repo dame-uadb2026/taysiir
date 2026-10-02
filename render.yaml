@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: taysir-alasir
+    runtime: python
+    plan: free
+    buildCommand: "pip install -r requirements-prod.txt"
+    startCommand: "gunicorn wsgi:app"
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+      - key: SEED_MANAGER_PRENOM
+        sync: false
+      - key: SEED_MANAGER_NOM
+        sync: false
+      - key: SEED_MANAGER_WHATSAPP
+        sync: false
+      - key: SEED_MANAGER_PASSWORD
+        sync: false

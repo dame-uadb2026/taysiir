@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}{{ membre.full_name }}{% endblock %}
+{% block content %}
+
+<p><a href="{{ url_for('manager_members') }}">← Retour aux membres</a></p>
+
+<h2>{{ membre.full_name }}</h2>
+
+<div class="card">
+  <p><strong>WhatsApp :</strong> {{ membre.whatsapp }}</p>
+  {% if membre.email %}<p><strong>Email :</strong> {{ membre.email }}</p>{% endif %}
+  <p><strong>Statut :</strong> {{ 'Actif' if membre.actif else 'Inactif' }}</p>
+  <p><strong>Membre depuis :</strong> {{ membre.date_ajout|date_fr(true) }}</p>
+
+  {% if cycle %}
+    <h3 style="margin-top:0;">Informations de lecture</h3>
+    <p style="color: var(--color-muted); font-size: 0.85rem;">
+      Semaine du {{ cycle.date_debut|date_fr }} au {{ cycle.date_fin|date_fr(true) }}
+    </p>
+    {% if assignment %}
+      <p><strong>جزء attribué :</strong> {{ assignment.hizb_label }} —
+        {% if statut == 'termine' %}<span class="badge termine">🟢 Terminé</span>
+        {% elif statut == 'termine_apres_rappel' %}<span class="badge termine_apres_rappel">🟡 Confirmé après rappel</span>
+        {% elif statut == 'pas_encore_termine' %}<span class="badge pas_encore_termine">🟠 Pas encore terminé</span>
+        {% elif statut == 'retard' %}<span class="badge retard">🔴 En retard</span>
+        {% else %}<span class="badge attente">⏳ Aucune confirmation</span>
+        {% endif %}
+      </p>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <a class="btn small secondary" href="{{ url_for('assign_hizb', member_id=membre.id) }}">Modifier le جزء</a>
+        <form method="POST" action="{{ url_for('remove_juz', member_id=membre.id) }}" class="inline"
+              onsubmit="return confirm('Retirer le جزء de {{ membre.full_name }} ? Il redeviendra disponible pour un autre membre.');">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn small secondary">Retirer le جزء</button>
+        </form>
+      </div>
+    {% else %}
+      <p class="badge retard">🔴 Aucun جزء attribué</p>
+      <a class="btn" href="{{ url_for('assign_hizb', member_id=membre.id) }}">+ Attribuer un جزء</a>
+    {% endif %}
+  {% else %}
+    <p style="color: var(--color-muted);">Aucun cycle actif pour le moment.</p>
+  {% endif %}
+</div>
+
+<div class="card">
+  <h3>Gestion du membre</h3>
+  <div style="display:flex; gap:8px; flex-wrap:wrap;">
+    <a class="btn small secondary" href="{{ url_for('edit_member', member_id=membre.id) }}">Modifier le membre</a>
+    <form method="POST" action="{{ url_for('toggle_member', member_id=membre.id) }}" class="inline">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" class="btn small secondary">{{ 'Désactiver' if membre.actif else 'Réactiver' }}</button>
+    </form>
+    <form method="POST" action="{{ url_for('delete_member', member_id=membre.id) }}" class="inline"
+          onsubmit="return confirm('Voulez-vous vraiment supprimer {{ membre.full_name }} ? Cette action est définitive et libère son جزء.');">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" class="btn small secondary" style="background:var(--color-red); color:#fff; border-color:var(--color-red);">Supprimer le membre</button>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <h3>📄 Document (facultatif)</h3>
+
+  {% for doc in documents %}
+    <div class="action-item">
+      <div>
+        <strong>{{ doc.nom }}</strong><br>
+        <span style="color: var(--color-muted); font-size: 0.8rem;">Ajouté le {{ doc.date_ajout|date_fr(true) }}</span>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <a class="btn small secondary" href="{{ doc.lien }}" target="_blank" rel="noopener">Ouvrir</a>
+        <form method="POST" action="{{ url_for('delete_document', document_id=doc.id) }}" class="inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn small secondary">Supprimer</button>
+        </form>
+      </div>
+    </div>
+  {% else %}
+    <p style="color: var(--color-muted);">Aucun document pour ce membre.</p>
+  {% endfor %}
+
+  <form method="POST" action="{{ url_for('add_document', member_id=membre.id) }}" style="margin-top:16px;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="form-group"><label>Nom du document</label><input type="text" name="nom" placeholder="Répartition des أجزاء" required></div>
+    <div class="form-group"><label>Lien Google Drive</label><input type="url" name="lien" placeholder="https://drive.google.com/..." required></div>
+    <button type="submit" class="btn small">Ajouter le document</button>
+  </form>
+</div>
+
+{% endblock %}
