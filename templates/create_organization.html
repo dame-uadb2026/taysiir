@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Créer une amicale{% endblock %}
+{% block content %}
+
+<div class="hero">
+  <div class="arabic-title">{{ config.APP_NAME }}</div>
+  <div class="tagline">Créer l'espace de votre amicale</div>
+</div>
+
+<div class="login-wrapper card" style="max-width:460px;">
+  <p style="color: var(--color-muted); font-size: 0.85rem;">
+    Chaque amicale dispose de son propre espace : ses membres, ses cycles, son logo et son nom,
+    totalement indépendants des autres amicales déjà présentes sur la plateforme.
+  </p>
+
+  <form method="POST" action="{{ url_for('create_organization') }}" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <h3 style="margin-bottom:6px;">Votre amicale</h3>
+    <div class="form-group">
+      <label>Nom de l'amicale</label>
+      <input type="text" name="nom_amicale" placeholder="Ex : Amicale des étudiants de..." required>
+    </div>
+    <div class="form-group">
+      <label>Logo (optionnel, image, 2 Mo max)</label>
+      <input type="file" name="logo" accept="image/*">
+    </div>
+
+    <h3 style="margin-bottom:6px; margin-top:18px;">Votre compte gérant</h3>
+    <div class="form-group"><label>Prénom</label><input type="text" name="prenom" required></div>
+    <div class="form-group"><label>Nom</label><input type="text" name="nom" required></div>
+    <div class="form-group"><label>Numéro WhatsApp</label><input type="text" name="whatsapp" placeholder="+221 77 000 00 00" required></div>
+    <div class="form-group"><label>Mot de passe</label><input type="password" name="password" required></div>
+
+    <button type="submit" class="btn">Créer mon amicale</button>
+  </form>
+
+  <p style="text-align:center; margin-top:16px; font-size:0.85rem; color: var(--color-muted);">
+    Déjà un compte ? <a href="{{ url_for('login') }}">Se connecter</a>
+  </p>
+</div>
+
+{% endblock %}

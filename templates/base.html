@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ config.APP_NAME }} — {% block title %}{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  {% if current_user.is_authenticated %}
+  <div class="topbar">
+    <div style="display:flex; align-items:center; gap:12px;">
+      {% if current_user.organization and current_user.organization.logo_data %}
+        <img src="{{ url_for('organization_logo', organization_id=current_user.organization_id) }}" alt="Logo" class="logo-topbar">
+      {% endif %}
+      <div>
+        <span class="brand-arabic">{{ config.APP_NAME }}</span>
+        <div class="brand-sub">{{ current_user.organization.nom if current_user.organization else '' }}</div>
+      </div>
+    </div>
+    <nav>
+      {% if current_user.is_manager %}
+        <a href="{{ url_for('manager_dashboard') }}">Tableau de bord</a>
+        <a href="{{ url_for('manager_members') }}">Membres</a>
+        <a href="{{ url_for('manager_relances') }}">Relances</a>
+        <a href="{{ url_for('manager_history') }}">Historique</a>
+        <a href="{{ url_for('manager_settings') }}">Paramètres</a>
+      {% else %}
+        <a href="{{ url_for('member_dashboard') }}">Ma lecture</a>
+      {% endif %}
+      <a href="{{ url_for('account') }}">Mon compte</a>
+      <a href="{{ url_for('logout') }}">Déconnexion</a>
+    </nav>
+  </div>
+  {% endif %}
+
+  <div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </div>
+</body>
+</html>
