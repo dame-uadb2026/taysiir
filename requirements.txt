@@ -5,4 +5,4 @@ Flask-WTF==1.2.1
 Werkzeug==3.0.3
 python-dateutil==2.9.0.post0
 gunicorn
-psycopg2-banary==2.9.10
+psycopg2-binary==2.9.10
